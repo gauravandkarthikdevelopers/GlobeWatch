@@ -4,22 +4,33 @@ import { motion } from 'framer-motion';
 interface Props {
   activeCategories: EventCategory[];
   onToggle: (category: EventCategory) => void;
+  onSelectAll: () => void;
 }
 
 const ALL_CATEGORIES: EventCategory[] = [
   'war', 'disease', 'earthquake', 'flood', 'political', 'economic', 'climate', 'terrorism',
 ];
 
-const MapLegend = ({ activeCategories, onToggle }: Props) => {
+const MapLegend = ({ activeCategories, onToggle, onSelectAll }: Props) => {
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       className="absolute top-32 left-4 z-[1000] bg-card/90 backdrop-blur-xl border border-border rounded-lg p-3 shadow-2xl w-64 max-w-[calc(100vw-2rem)] max-h-[60vh] overflow-y-auto"
     >
-      <h3 className="font-display text-xs font-semibold text-primary tracking-wider uppercase mb-3">
-        Event Categories
-      </h3>
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <h3 className="font-display text-xs font-semibold text-primary tracking-wider uppercase">
+          Event Categories
+        </h3>
+        <button
+          type="button"
+          onClick={onSelectAll}
+          className="text-[10px] font-display font-semibold text-muted-foreground hover:text-foreground hover:bg-accent/50 px-2 py-1 rounded transition-colors"
+          aria-label="Select all event categories"
+        >
+          Select All
+        </button>
+      </div>
       <div className="space-y-1.5">
         {ALL_CATEGORIES.map(cat => {
           const active = activeCategories.includes(cat);

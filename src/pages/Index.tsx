@@ -28,8 +28,16 @@ const Index = () => {
 
   const toggleCategory = useCallback((cat: EventCategory) => {
     setActiveCategories(prev =>
-      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+      prev.includes(cat)
+        ? prev.length === 1
+          ? prev
+          : prev.filter(c => c !== cat)
+        : [...prev, cat]
     );
+  }, []);
+
+  const selectAllCategories = useCallback(() => {
+    setActiveCategories([...ALL_CATEGORIES]);
   }, []);
 
   const handleEventClick = useCallback((event: GlobalEvent) => {
@@ -89,7 +97,11 @@ const Index = () => {
 
       {/* Legend - shift down when industry panel not open */}
       {!industryOpen && (
-        <MapLegend activeCategories={activeCategories} onToggle={toggleCategory} />
+        <MapLegend
+          activeCategories={activeCategories}
+          onToggle={toggleCategory}
+          onSelectAll={selectAllCategories}
+        />
       )}
 
       {/* Timeline */}

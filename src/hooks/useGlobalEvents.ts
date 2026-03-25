@@ -198,8 +198,9 @@ async function fetchReliefWebEvents(range: TimeRange): Promise<GlobalEvent[]> {
 }
 
 export function useGlobalEvents(range: TimeRange, activeCategories: EventCategory[]) {
+  const stableActiveCategoriesKey = [...activeCategories].sort().join(',');
   return useQuery({
-    queryKey: ['global-events', range],
+    queryKey: ['global-events', range, stableActiveCategoriesKey],
     queryFn: async () => {
       const [earthquakes, gdelt, reliefweb] = await Promise.all([
         fetchEarthquakes(range),
