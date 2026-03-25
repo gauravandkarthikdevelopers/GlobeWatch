@@ -17,6 +17,17 @@ const GlobeMap = forwardRef<GlobeMapHandle, Props>(({ events, onEventClick }, re
   const markersRef = useRef<L.LayerGroup | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Keep latest callback + event objects without re-creating marker click handlers.
+  const onEventClickRef = useRef(onEventClick);
+  const eventByIdRef = useRef(new Map<string, GlobalEvent>());
+  const markersByIdRef = useRef(
+    new Map<string, { marker: L.Marker; iconKey: string }>()
+  );
+
+  useEffect(() => {
+    onEventClickRef.current = onEventClick;
+  }, [onEventClick]);
+
   useImperativeHandle(ref, () => ({
     flyTo: (lat: number, lng: number, zoom = 5) => {
       mapRef.current?.flyTo([lat, lng], zoom, { duration: 1.5 });
@@ -52,12 +63,21 @@ const GlobeMap = forwardRef<GlobeMapHandle, Props>(({ events, onEventClick }, re
 
   useEffect(() => {
     if (!markersRef.current) return;
-    markersRef.current.clearLayers();
 
-    events.forEach(event => {
+    const layerGroup = markersRef.current;
+
+    // Replace latest event lookup map (used by click handlers).
+    eventByIdRef.current = new Map(events.map(e => [e.id, e]));
+
+    // Update existing markers + add missing ones.
+    const nextIds = new Set(events.map(e => e.id));
+    const markersById = markersByIdRef.current;
+
+    const createIcon = (event: GlobalEvent) => {
       const color = EVENT_COLORS[event.category];
       const size = SEVERITY_SIZES[event.severity];
-      
+      const iconKey = `${event.category}-${event.severity}-${size}-${color}`;
+
       const icon = L.divIcon({
         className: 'custom-marker',
         html: `
@@ -89,11 +109,42 @@ const GlobeMap = forwardRef<GlobeMapHandle, Props>(({ events, onEventClick }, re
         iconAnchor: [size, size],
       });
 
+      return { icon, iconKey };
+    };
+
+    // Add/update markers (no full clear -> smoother refresh).
+    for (const event of events) {
+      const existing = markersById.get(event.id);
+
+      if (existing) {
+        existing.marker.setLatLng([event.lat, event.lng]);
+
+        const { icon, iconKey } = createIcon(event);
+        if (existing.iconKey !== iconKey) {
+          existing.marker.setIcon(icon);
+          existing.iconKey = iconKey;
+        }
+        continue;
+      }
+
+      const { icon, iconKey } = createIcon(event);
       const marker = L.marker([event.lat, event.lng], { icon });
-      marker.on('click', () => onEventClick(event));
-      markersRef.current?.addLayer(marker);
-    });
-  }, [events, onEventClick]);
+      marker.on('click', () => {
+        const e = eventByIdRef.current.get(event.id);
+        if (e) onEventClickRef.current(e);
+      });
+      layerGroup.addLayer(marker);
+      markersById.set(event.id, { marker, iconKey });
+    }
+
+    // Remove markers not present anymore.
+    for (const [id, stored] of markersById.entries()) {
+      if (!nextIds.has(id)) {
+        layerGroup.removeLayer(stored.marker);
+        markersById.delete(id);
+      }
+    }
+  }, [events]);
 
   return <div ref={containerRef} className="w-full h-full" />;
 });

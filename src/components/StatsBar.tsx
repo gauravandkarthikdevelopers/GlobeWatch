@@ -13,6 +13,11 @@ const StatsBar = ({ events, isLoading }: Props) => {
     return acc;
   }, {} as Record<string, number>);
 
+  const sourceCounts = events.reduce((acc, e) => {
+    acc[e.source] = (acc[e.source] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
   const criticalCount = events.filter(e => e.severity === 'critical' || e.severity === 'high').length;
 
   return (
@@ -49,6 +54,18 @@ const StatsBar = ({ events, isLoading }: Props) => {
             <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
           </div>
         ))}
+      </div>
+
+      <div className="flex items-center gap-2">
+        <div className="h-4 w-px bg-border" />
+        {Object.entries(sourceCounts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 3)
+          .map(([src, count]) => (
+            <span key={src} className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">
+              {src}: {count}
+            </span>
+          ))}
       </div>
     </motion.div>
   );

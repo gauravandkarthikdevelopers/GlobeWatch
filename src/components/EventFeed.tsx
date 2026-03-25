@@ -7,6 +7,13 @@ interface Props {
   onEventClick: (event: GlobalEvent) => void;
 }
 
+const severityLabel: Record<GlobalEvent['severity'], string> = {
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High',
+  critical: 'Critical',
+};
+
 const EventFeed = ({ events, onEventClick }: Props) => {
   const sorted = [...events]
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
@@ -54,6 +61,16 @@ const EventFeed = ({ events, onEventClick }: Props) => {
                   <span className="text-[10px] text-muted-foreground">•</span>
                   <span className="text-[10px] text-muted-foreground">{event.source}</span>
                 </div>
+
+              <div className="flex items-center gap-1 mt-1">
+                <span className="text-[10px] font-medium text-muted-foreground truncate">
+                  {EVENT_LABELS[event.category]}
+                </span>
+                <span className="text-[10px] text-muted-foreground">•</span>
+                <span className="text-[10px] font-display font-semibold text-foreground/80">
+                  {severityLabel[event.severity]}
+                </span>
+              </div>
               </div>
               <ChevronRight size={12} className="text-muted-foreground mt-1 flex-shrink-0" />
             </button>
