@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 20% 7%;
+    --foreground: 210 20% 92%;
+
+    --card: 220 18% 10%;
+    --card-foreground: 210 20% 92%;
+
+    --popover: 220 18% 10%;
+    --popover-foreground: 210 20% 92%;
+
+    --primary: 160 100% 45%;
+    --primary-foreground: 220 20% 7%;
+
+    --secondary: 220 15% 16%;
+    --secondary-foreground: 210 20% 85%;
+
+    --muted: 220 15% 14%;
+    --muted-foreground: 215 15% 50%;
+
+    --accent: 220 15% 18%;
+    --accent-foreground: 210 20% 92%;
+
+    --destructive: 0 80% 55%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 15% 18%;
+    --input: 220 15% 18%;
+    --ring: 160 100% 45%;
+
+    --radius: 0.5rem;
+
+    /* Event category colors */
+    --event-war: 0 85% 55%;
+    --event-disease: 35 95% 55%;
+    --event-earthquake: 280 70% 60%;
+    --event-flood: 200 85% 55%;
+    --event-political: 45 90% 55%;
+    --event-economic: 160 100% 45%;
+    --event-climate: 170 60% 50%;
+    --event-terrorism: 350 80% 50%;
+
+    /* Glows */
+    --glow-primary: 0 0 20px hsl(160 100% 45% / 0.3);
+    --glow-war: 0 0 15px hsl(0 85% 55% / 0.4);
+    --glow-disease: 0 0 15px hsl(35 95% 55% / 0.4);
+    --glow-earthquake: 0 0 15px hsl(280 70% 60% / 0.4);
+
+    --font-display: 'JetBrains Mono', monospace;
+    --font-body: 'Inter', sans-serif;
+
+    --sidebar-background: 220 18% 10%;
+    --sidebar-foreground: 210 20% 85%;
+    --sidebar-primary: 160 100% 45%;
+    --sidebar-primary-foreground: 220 20% 7%;
+    --sidebar-accent: 220 15% 16%;
+    --sidebar-accent-foreground: 210 20% 92%;
+    --sidebar-border: 220 15% 18%;
+    --sidebar-ring: 160 100% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}
+
+/* Leaflet overrides for dark theme */
+.leaflet-container {
+  background: hsl(220 20% 5%) !important;
+}
+.leaflet-tile-pane {
+  filter: brightness(0.6) contrast(1.3) saturate(0.3) hue-rotate(180deg) invert(1);
+}
+.leaflet-control-zoom a {
+  background: hsl(220 18% 10%) !important;
+  color: hsl(210 20% 92%) !important;
+  border-color: hsl(220 15% 18%) !important;
+}
+.leaflet-control-attribution {
+  display: none !important;
+}
+
+/* Custom pulse animation for map markers */
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+}
+.pulse-marker {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: hsl(220 20% 7%); }
+::-webkit-scrollbar-thumb { background: hsl(220 15% 22%); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(220 15% 30%); }
